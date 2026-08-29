@@ -16,9 +16,17 @@ AI 说它做完了——怎么证明它真做完了？`claimcheck` 把 agent 的
 ## 用法
 
 ```bash
-# 当前只实现 W1 范围：scope 核验
+# 通过包装器执行验证命令，留下绑定 diff 指纹的凭证（存 .claimcheck/receipts/）
+node src/cli.mjs run npm test
+
+# 核验完成声明：scope + execution + freshness 三项全过才 PASS
 node src/cli.mjs verify --claim claim.yaml --base HEAD
 ```
+
+- `execution`：声称跑过的命令必须有真实凭证；声称 pass 但凭证失败 → `VIOLATION (business-failure)`
+- `freshness`：凭证绑定的 diff 指纹必须与当前工作区一致；验证后又改了代码 → `VIOLATION (stale-evidence)`
+- 凭证目录自动加入 `.git/info/exclude`，不污染 diff 与 scope 核验
+- 声明不含任何验证命令时，执行维度判 `INSUFFICIENT_EVIDENCE`（fail-closed）
 
 `claim.yaml`（JSON 语法，合法 YAML 子集）：
 
@@ -38,10 +46,12 @@ node src/cli.mjs verify --claim claim.yaml --base HEAD
   "verdict": "VIOLATION",
   "task": "给定价模块加批量折扣接口",
   "checks": [
-    { "name": "scope", "verdict": "VIOLATION", "subtype": "out-of-scope",
-      "evidence": ["声明范围: src/pricing/**, test/pricing/**", "越界文件 (1): deploy.sh"] }
+    { "name": "scope", "verdict": "PASS", "evidence": ["全部 2 个改动文件均在声明范围内（src/pricing/**, test/pricing/**）"] },
+    { "name": "execution", "verdict": "PASS", "evidence": ["\"npm test\" 有凭证（a1b2c3…），退出码 0，与声称一致"] },
+    { "name": "freshness", "verdict": "VIOLATION", "subtype": "stale-evidence",
+      "evidence": ["凭证 a1b2c3 绑定指纹 …与当前工作区不一致——验证之后代码又变过"] }
   ],
-  "subtype": "out-of-scope"
+  "subtype": "stale-evidence"
 }
 ```
 
@@ -57,8 +67,8 @@ node src/cli.mjs verify --claim claim.yaml --base HEAD
 
 ## Roadmap
 
-- **W1（当前）**：claim schema + `scope` 核验器 + 单测
-- W2：`claimcheck run <cmd>` 执行凭证（receipt，绑定 diff 指纹）+ `execution` / `freshness` 核验器
+- ~~W1：claim schema + `scope` 核验器 + 单测~~ ✅
+- ~~W2：`claimcheck run <cmd>` 执行凭证（receipt，绑定 diff 指纹）+ `execution` / `freshness` 核验器~~ ✅
 - W3：MCP server 薄封装 + Claude Code Stop hook 示例 + 端到端 demo
 - W4：真实工作流 dogfood + 20+ 场景 eval 集
 
