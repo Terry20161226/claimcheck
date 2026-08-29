@@ -6,7 +6,7 @@ export class GitError extends Error {}
 export function changedFiles(cwd, base = 'HEAD') {
   const run = (...args) => {
     try {
-      return execFileSync('git', args, { cwd, encoding: 'utf8' });
+      return execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
     } catch (e) {
       throw new GitError(`git ${args.join(' ')} 失败: ${(e.stderr || e.message).trim()}`);
     }

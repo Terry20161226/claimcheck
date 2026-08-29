@@ -6,7 +6,8 @@
   "bin": { "claimcheck": "src/cli.mjs" },
   "engines": { "node": ">=18" },
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "eval": "node eval/run-eval.mjs"
   },
   "license": "MIT"
 }

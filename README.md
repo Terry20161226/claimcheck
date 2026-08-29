@@ -78,12 +78,13 @@ MCP 工具：`claimcheck_run`（留凭证）、`claimcheck_verify`（四值判�
 - ~~W1：claim schema + `scope` 核验器 + 单测~~ ✅
 - ~~W2：`claimcheck run <cmd>` 执行凭证（receipt，绑定 diff 指纹）+ `execution` / `freshness` 核验器~~ ✅
 - ~~W3：MCP server 薄封装 + Claude Code Stop hook 示例 + 端到端 demo~~ ✅
-- W4：真实工作流 dogfood + 20+ 场景 eval 集
+- W4：~~≥20 场景 eval 集~~ ✅（23 场景，`npm run eval`，100% 通过断言）；真实工作流 dogfood 进行中
 
 ## 测试
 
 ```bash
-npm test
+npm test        # 单元 + 端到端测试（30 个）
+npm run eval    # eval 集：23 个构造场景，断言 verdict + subtype
 ```
 
 ## 许可
