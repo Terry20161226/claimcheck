@@ -21,7 +21,15 @@ node src/cli.mjs run npm test
 
 # 核验完成声明：scope + execution + freshness 三项全过才 PASS
 node src/cli.mjs verify --claim claim.yaml --base HEAD
+
+# MCP server（Claude Code / Qoder / Codex 均可挂，stdio 零依赖）
+node src/cli.mjs mcp
+
+# 端到端 demo：故意谎报三次全部被抓住（临时目录，不碰真实仓库）
+bash examples/e2e-demo.sh
 ```
+
+MCP 工具：`claimcheck_run`（留凭证）、`claimcheck_verify`（四值判定 + 逐项证据）。Claude Code Stop hook 示例见 `hooks/claude-code-stop-hook.sh`——agent 收尾时自动核验，非 PASS 即拦截并把证据回喂给 agent。
 
 - `execution`：声称跑过的命令必须有真实凭证；声称 pass 但凭证失败 → `VIOLATION (business-failure)`
 - `freshness`：凭证绑定的 diff 指纹必须与当前工作区一致；验证后又改了代码 → `VIOLATION (stale-evidence)`
@@ -69,7 +77,7 @@ node src/cli.mjs verify --claim claim.yaml --base HEAD
 
 - ~~W1：claim schema + `scope` 核验器 + 单测~~ ✅
 - ~~W2：`claimcheck run <cmd>` 执行凭证（receipt，绑定 diff 指纹）+ `execution` / `freshness` 核验器~~ ✅
-- W3：MCP server 薄封装 + Claude Code Stop hook 示例 + 端到端 demo
+- ~~W3：MCP server 薄封装 + Claude Code Stop hook 示例 + 端到端 demo~~ ✅
 - W4：真实工作流 dogfood + 20+ 场景 eval 集
 
 ## 测试

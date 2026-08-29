@@ -25,8 +25,9 @@ export function verifyExecution(claim, receipts) {
     matched.push(latest);
     if (v.result === 'pass' && latest.exitCode !== 0) {
       worst = VERDICT.VIOLATION;
+      const tailLine = latest.tail.trim().split('\n').filter(Boolean).pop();
       evidence.push(
-        `声称 "${v.command}" 通过，但最近凭证（${latest.id}）退出码 ${latest.exitCode}（${latest.tail.trim().split('\n').pop() ?? ''}）`,
+        `声称 "${v.command}" 通过，但最近凭证（${latest.id}）退出码 ${latest.exitCode}${tailLine ? `（${tailLine}）` : ''}`,
       );
     } else if (v.result === 'fail' && latest.exitCode === 0) {
       worst = VERDICT.VIOLATION;
