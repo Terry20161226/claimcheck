@@ -19,9 +19,11 @@ function emit(result) {
 function splitArgs(argv) {
   const flags = {};
   const pos = [];
+  let commandStarted = false;
   for (let i = 0; i < argv.length; i++) {
-    if (argv[i].startsWith('--')) flags[argv[i]] = argv[++i];
-    else pos.push(argv[i]);
+    if (!commandStarted && argv[i] === '--') { commandStarted = true; continue; }
+    if (!commandStarted && argv[i].startsWith('--')) flags[argv[i]] = argv[++i];
+    else { commandStarted = true; pos.push(argv[i]); }
   }
   return { flags, pos };
 }

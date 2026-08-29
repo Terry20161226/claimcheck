@@ -142,3 +142,24 @@ test('receipt 目录自动加入 git exclude，不污染 diff', () => {
   const { result } = runCli(['verify', '--claim', claimPath], dir);
   assert.ok(!result.checks[0].evidence.join(' ').includes('.claimcheck'));
 });
+
+test('回归：run 后命令自身的 --flag 不被吞掉（dogfood 首次使用抓到的 bug）', () => {
+  const dir = makeRepo();
+  writeFileSync(join(dir, 'src/feature.js'), 'export const y = 2;\n');
+  writeFileSync(join(dir, 'package.json'), '{"name":"t","type":"module"}');
+  // node --test 里的 --test 必须原样进入 receipt.command
+  runCli(['run', 'node', '--test', 'test/does-not-exist'], dir);
+  const claimPath = writeClaimOutside(claim(['src/**', 'package.json'], [{ command: 'node --test test/does-not-exist', result: 'fail' }]));
+  const { result } = runCli(['verify', '--claim', claimPath], dir);
+  // 若 --test 被参数解析吞掉，receipt.command 会变成 "node"，execution 判 INSUFFICIENT_EVIDENCE
+  assert.equal(result.checks.find((c) => c.name === 'execution').verdict, 'PASS');
+});
+
+test('回归：-- 分隔符后的内容全部算命令', () => {
+  const dir = makeRepo();
+  writeFileSync(join(dir, 'src/feature.js'), 'export const y = 2;\n');
+  runCli(['run', '--', 'node', '--eval', 'process.exit(0)'], dir);
+  const claimPath = writeClaimOutside(claim(['src/**'], [{ command: 'node --eval process.exit(0)', result: 'pass' }]));
+  const { result } = runCli(['verify', '--claim', claimPath], dir);
+  assert.equal(result.verdict, 'PASS');
+});
