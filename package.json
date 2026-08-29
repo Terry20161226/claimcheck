@@ -1,0 +1,12 @@
+{
+  "name": "claimcheck",
+  "version": "0.1.0",
+  "description": "Mechanical verification of coding-agent completion claims: scope, execution evidence, freshness.",
+  "type": "module",
+  "bin": { "claimcheck": "src/cli.mjs" },
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "test": "node --test"
+  },
+  "license": "MIT"
+}

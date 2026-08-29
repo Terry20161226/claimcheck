@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "task": "给定价模块加批量折扣接口",
+  "scope": {
+    "allowedPaths": ["src/pricing/**", "test/pricing/**", "docs/api.md"]
+  },
+  "verification": [
+    { "command": "npm test", "result": "pass" }
+  ]
+}
