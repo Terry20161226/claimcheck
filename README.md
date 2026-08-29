@@ -4,6 +4,12 @@
 
 AI 说它做完了——怎么证明它真做完了？`claimcheck` 把 agent 的完成声明（改了哪些文件、跑了哪些验证、结果如何）与 git 权威状态和执行凭证逐项对表，给出结构化判定。
 
+## 真实案例：作者自己第一次用就被抓了
+
+dogfood 首日，作者用 claimcheck 给自己的提交收尾，预期"肯定 PASS"——结果 `INSUFFICIENT_EVIDENCE`：`claimcheck run node --test` 里的 `--test` 被 CLI 参数解析吞掉，凭证里只剩光秃秃的 `node`，于是 execution 判定"声称执行过 `node --test` 但没有任何执行凭证"。一个连作者自己都没意识到的真 bug，被"只认证据"四个字逼出水面。（修复见 commit `067b426`，日志见 `dogfood/log.md`）
+
+这就是这个工具存在的原因：**不是 agent 不诚实，是"我记得跑过了"在机制上就不是证据。**
+
 ## 四值判定（不得合并）
 
 | verdict | 含义 | exit code |
